@@ -1,0 +1,82 @@
+Dodge 설정
+
+
+Border
+-움직이지 않을 것이라 Rigidbody 2D Static으로 설정
+-Box Collider 2D 4개 만들고 각각 Main Camera의 주위를 감싸게 배치한 후
+-Composite Collider 2D로 묶었다
+-태그와 레이어는 각각 Border로 설정
+
+
+KillZone
+-움직이지 않을 것이라 Rigidbody 2D Static으로 설정
+-Box Collider 2D 4개 만들고 각각 EnemySpawner의 바깥을 약간의 거리를 두고 감싸게 배치한 후
+-Composite Collider 2D로 묶었다
+-KillZone이라는 스크립트를 만들어서 OnTriggerEnter2D로 충돌을 감지했고
+-collision.gameObject.SetActive(false) 로 풀에 있는 오브젝트일 경우 비활성화
+-Destroy(collision.gameObject) 아닐 경우 게임 오브젝트 삭제하게 만들었다
+
+
+Space
+-그냥 배경의 역할을 수행
+-Sorting Layer는 Background로 가장 뒤에 그려지게 함
+
+
+Factory
+-오브젝트 풀을 관리하고 있으며, 풀 컴포넌트를 찾고, 초기화
+-풀에 있는 게임 오브젝트를 가져오고
+-Getㅇㅇㅇ 으로 다른 스크립트에서 불러올 수 있게 했다
+
+
+GameManager
+-Singleton 을 상속받고 있으며
+-OnInitialize() 에서 Player를 찾는다
+
+
+Enemy
+-Rigidbody 2D Kinematic, Use Full Kinematic Contact
+-Circle Collider 2D로 범위 설정
+-Enemy 스크립트에서 X(-9, 9), Y(-3, 3) 범위의 무작위 좌표를 설정하고
+-현재 위치와 설정된 좌표 사이의 방향을 계산하여
+-설정된 방향으로 직선운동하게 했다
+
+
+EnemySpawner
+-Enemy Prefab을 받고있고
+-EnemySpawner 스크립트에서 x(10, 10), y(-6, 6) 범위의 상자 모양 기즈모를 그리고
+-그려진 기즈모 위의
+-GetSpawnPosition() 에서 랜덤하게 하나를 선택하고
+-Factory.Instance.GetEnemy(GetSpawnPosition()) 으로 팩토리에서 생성하는 것을
+-for 문으로 4개 생성되게 했다
+-생성된 Enemy는 위의 설정대로 직선운동한다
+
+
+Shield
+-생성시 105~165도 각도로 직선운동
+-플레이어와 충돌할 시 pool로 돌아가고
+-벽(Border태그)에 충돌할 시 총 5번 Vector2.Reflect로 반사
+-방향 전환 횟수가 0이하면 오브젝트 비활성화
+
+
+ItemSpawner
+-Shield를 5초마다 팩토리에서 꺼냄
+
+
+Player
+-wasd 키를 입력받아 움직이고
+-Normalize로 대각선 이동시 이동속도를 일정하게 유지
+-Border에 부딪쳤을 때 덜덜 떨리는 문제가 있어 이동을 Update에서 FixedUpdate로 변경
+-Player의 0번째 자식(Shilde)을 찾고
+-OnCollisionEnter2D로 충돌한 객체가 Enemy일 경우 Player를 Destroy하고 -Time.timeScale = 0.0f; 으로 시간 정지
+-충돌한 객체가 Item일 경우 Player의 0번째 자식을 활성화 하는 코루틴 실행
+-그 코루틴은 3초 후에 비활성화
+-객체 확인은 CompareTag로 했다
+-점수 확인 및 설정용 프로퍼티 만들어서
+-Score UI와 연결
+
+
+CircleShield
+-Enemy나 Item과 부딪치면 비활성화
+
+
+
